@@ -6,10 +6,8 @@
 #include <vector>
 #include <fstream>
 #include "user-information.h"
-#include "global-constants.h"
-#include <cmath>
-#include <unordered_map>
-
+#include "Constant-comands.h"
+#include <iomanip>
 using namespace std;
 
 
@@ -18,132 +16,119 @@ bool isLogged = false;
 UserInfo loggedUser;
 
 
-//
-////void loadUsers()
-////{
-////	//TODO: load all the users from the file and add them to the users vector
-////}
-//
-//void initUser(User& user, string name, stirng password, string balance)
+
+//void loadUsers()
 //{
-//	strcpy(user.name, name);
-//	strcpy(user.password);
-//	strcpy(user.balance);
-//}
+//	std::ifstream file("users.txt");
 //
-//void writeUserToFile(ofstream& outFile, const User& user)
-//{
-//	outFile << user.name << ":" << user.password << ":" << user.balance << endl;
-//}
+//	if (!file.is_open()) {
+//		cerr << "Error: unable to open file for reading" << endl;
+//		return;
+//	}
 //
-//User readUser(string line)
-//{
-//	User toReturn;
-//	int size = strlen(line);
-//	string buff;
-//	int field = 1;
-//	for (size_t i = 0, j =0; i <= size ; i++)
+//	string current;
+//	while (!file.eof())
 //	{
-//		if (line[i] == ':' || line[i] == '\n') {
-//			buff[j] == '\0';
-//
-//			switch (field)
-//			{
-//			case 1: strcpy(toReturn.name, buff); break;
-//			case 2: strcpy(toReturn.password, buff);break;
-//			}
-//			field++;
-//			j = 0;
-//		}
-//		else
+//		getline(file, current);
+//		UserInfo user;
+//		int i = 0;
+//		while (current[i] != ':')
 //		{
-//			buff[j] = line[i];
-//			j++;
+//			user.userName.push_back(current[i]);
+//			++i;
 //		}
-//	}
-//	strcpy(toReturn.balance, buff);
-//	return toReturn;
-//}
-//
-//bool validateUsername(const string& username)//check again!!! and what about space?
-//{
-//	if (username.find_first_of("0123456789") != string::npos)
-//	{
-//		return false;
-//	}
-//	return true;
-//}
-//
-//bool validatePassword(string password)
-//{
-//	const int PASS_LENGTH = 5;
-//	if (password.size() < PASS_LENGTH)
-//	{
-//		return false;
-//	}
-//
-//	for (int i = 0; i < password.size(); i++)
-//	{
-//		if ((string[i] < 'A' && string[i]>'Z') && (string[i] < 'a' && string[i]>'z')
-//			&& (string[i] < '0' && string[i]>'9') && string[i] != '!' && string[i] != '@' && string[i] != '#'
-//			&& string[i] != '%' && string[i] != '^' && string[i] != '&' && string[i] != '*')
+//		++i; //going after first :
+//		while (current[i] != ':')
 //		{
-//			return false;
+//			user.password.push_back(current[i]);
+//			++i;
 //		}
+//		++i; //going after second :
+//
+//		string curBalance;
+//		while (i < current.size()) {//check if '\0' is better
+//			curBalance.push_back(current[i]);
+//			++i;
+//		}
+//
+//		user.balance = stod(curBalance);
+//		users.push_back(user);
 //	}
-//	return true;
 //}
 
-void loadUsers()
+
+double stringToDouble(string str)
 {
+	double result = 0.0;
+	int index = 0;
+	for (int i = 0; i < str.size();i++)
+	{
+		if (str[i] == '.' || str[i] == ',')
+		{
+			index = i;
+			break;
+		}
+		if (str[i] == '\0')
+		{
+			index = i;
+			break;
+		}
+
+		result *= 10;
+		result += (double)(str[i] - '0');
+	}
+	int power = 1;
+	for (int i = index + 1; i < str.size(); i++)
+	{
+
+		if (str[i] == '\0')
+		{
+			break;
+		}
+		result += (double)((str[i] - '0') / pow(10, power));
+		power++;
+	}
+	return result;
+}
+
+void loadUsers() {
 	std::ifstream file("users.txt");
 
 	if (!file.is_open()) {
-		cerr << "Error: unable to open file for reading" << endl;
+		cerr << "Error: unable to open file." << endl;
 		return;
 	}
 
 	string current;
 	while (!file.eof())
 	{
-		getline(file, current);
+		getline(file, current, ':');
 		UserInfo user;
-		int i = 0;
-		while (current[i] != ':')
-		{
-			user.userName.push_back(current[i]);
-			++i;
-		}
-		++i; //going after first :
-		while (current[i] != ':')
-		{
-			user.password.push_back(current[i]);
-			++i;
-		}
-		++i; //going after second :
 
-		string curBalance;
-		while (i < current.size()) {//check if '\0' is better
-			curBalance.push_back(current[i]);
-			++i;
-		}
+		user.username = current;
 
-		user.balance = stod(curBalance);
+		getline(file, current, ':');
+		user.password = current;
+
+		getline(file, current);
+		user.balance = stringToDouble(current);//
+
 		users.push_back(user);
 	}
+	file.close();
 }
 
 bool validateUsername(string name)
 {
-	int index = 0;
 	for (int i = 0; i < name.size(); i++)
 	{
-		if (name[i] >= '0' || name[i] <= '9') {
+		if (name[i] < ' ' && name[i] > '~')
+		{
 			return false;
 		}
-		else
+		if (name[i] >= '0' && name[i] <= '9')
 		{
-			return true;
+			return false;
 		}
 	}
 	return true;
@@ -200,7 +185,7 @@ bool validatePassword(string password)
 
 bool existsByUsername(string username) {
 	for (UserInfo& user : users) {
-		if (user.userName == username) {
+		if (user.username == username) {
 			return true;
 		}
 	}
@@ -224,9 +209,9 @@ unsigned hashPassword(string password)
 
 void login(string username, string password) {
 	unsigned hashedPassword = hashPassword(password);
-	string hash_pass = intToString(hashedPassword);
+	
 	for (UserInfo& user : users) {
-		if (user.userName == username && user.password == hash_pass) {
+		if (user.username == username && user.password == intToString(hashedPassword)) {
 			isLogged = true;
 			loggedUser = user;
 		}
@@ -242,7 +227,7 @@ string create(string username, string password)
 		return "Invalid password.";
 	}
 	if (existsByUsername(username)) {
-		return "User with the same email already exists.";
+		return "User with the same name already exists.";
 	}
 
 	unsigned hashedPassword = hashPassword(password);
@@ -254,7 +239,7 @@ string create(string username, string password)
 	isLogged = true;
 	loggedUser = user;
 	
-	return "REGISTERED_SUCCESSFULLY_MESSAGE";
+	return "You have just registered successfully!";
 }
 
 void logout() {
@@ -262,16 +247,32 @@ void logout() {
 	isLogged = false;
 }
 
+void cancelAccount() {
+	string password;
+	cin >> password;
+	if (isLogged && loggedUser.balance == 0)
+	{
+		vector<UserInfo>::iterator iter;
+		for (iter = users.begin(); iter != users.end(); iter++) {
+			if ((*iter).username == loggedUser.username) {
+				users.erase(iter);
+				break;
+			}
+		}
+	}
+	logout();
+}
+
 void deposit(double amount)
 {
-	int index = 0;
-	double newAmount = floor(amount * 100) / 100;// za da zakruglim 1.234-->1.23
 	if (amount < 0)
 	{
 		cout << "INVALID AMOUNT OF MONEY!" << endl;
 	}
 	else
 	{
+		int index = 0;
+		double newAmount = floor(amount * 100) / 100;// from 1.234 -- to --> 1.23
 		loggedUser.balance += newAmount;
 	}
 }
@@ -298,5 +299,27 @@ void transfer(string username, double amount)
 	}
 	int newAmount = floor(amount * 100 + 0.5) / 100;
 
+}
+
+bool saveState() {
+	ofstream deleteData("users.txt");
+
+	if (!deleteData.is_open()) {
+		cout << "File did not open!" << '\n';
+		return false;
+	}
+
+	deleteData << "";
+
+	deleteData.close();
+
+	ofstream writeToFile("users.txt", ios::app);
+
+	for (auto& x : users) {
+		writeToFile << x.username << ':' << x.password << ':' << x.balance << '\n';
+	}
+
+	writeToFile.close();
+	return true;
 }
 #endif // ! ENCODINGPASSWORD_USER_SERVICE_H
