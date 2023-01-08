@@ -17,44 +17,51 @@ UserInfo loggedUser;
 
 
 
-//void loadUsers()
-//{
-//	std::ifstream file("users.txt");
-//
-//	if (!file.is_open()) {
-//		cerr << "Error: unable to open file for reading" << endl;
-//		return;
-//	}
-//
-//	string current;
-//	while (!file.eof())
-//	{
-//		getline(file, current);
-//		UserInfo user;
-//		int i = 0;
-//		while (current[i] != ':')
-//		{
-//			user.userName.push_back(current[i]);
-//			++i;
-//		}
-//		++i; //going after first :
-//		while (current[i] != ':')
-//		{
-//			user.password.push_back(current[i]);
-//			++i;
-//		}
-//		++i; //going after second :
-//
-//		string curBalance;
-//		while (i < current.size()) {//check if '\0' is better
-//			curBalance.push_back(current[i]);
-//			++i;
-//		}
-//
-//		user.balance = stod(curBalance);
-//		users.push_back(user);
-//	}
-//}
+void loadUsers()
+{
+	std::ifstream file("users.txt");
+
+	if (!file.is_open()) {
+		cerr << "Error: unable to open file for reading" << endl;
+		return;
+	}
+
+	string current;
+	while (!file.eof())
+	{
+		getline(file, current);
+		if (current.size() == 0) {
+			break;
+		}
+		UserInfo user;
+		int i = 0;
+		while (current[i] != ':')
+		{
+			user.username.push_back(current[i]);
+			++i;
+		}
+		++i; //going after first :
+		string curPass;
+		while (current[i] != ':')
+		{
+			curPass.push_back(current[i]);
+			++i;
+		}
+		user.password = stoi(curPass);
+
+		++i; //going after second :
+
+		string curBalance;
+		while (i < current.size()) {//check if '\0' is better
+			curBalance.push_back(current[i]);
+			++i;
+		}
+
+		user.balance = stringToDouble(curBalance);
+		users.push_back(user);
+	}
+	loggedUser = nullptr;
+}
 
 
 double stringToDouble(string str)
