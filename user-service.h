@@ -98,33 +98,6 @@ double stringToDouble(string str)
 	return result;
 }
 
-void loadUsers() {
-	std::ifstream file("users.txt");
-
-	if (!file.is_open()) {
-		cerr << "Error: unable to open file." << endl;
-		return;
-	}
-
-	string current;
-	while (!file.eof())
-	{
-		getline(file, current, ':');
-		UserInfo user;
-
-		user.username = current;
-
-		getline(file, current, ':');
-		user.password = current;
-
-		getline(file, current);
-		user.balance = stringToDouble(current);//
-
-		users.push_back(user);
-	}
-	file.close();
-}
-
 bool validateUsername(string name)
 {
 	for (int i = 0; i < name.size(); i++)
@@ -191,12 +164,11 @@ bool validatePassword(string password)
 }
 
 bool existsByUsername(string username) {
-	for (UserInfo& user : users) {
-		if (user.username == username) {
+	for (int i =0; i< users.size(); ++i) {
+		if (users[i].username == username) {
 			return true;
 		}
 	}
-
 	return false;
 }
 
@@ -206,12 +178,9 @@ string intToString(int n)
 	return str;
 }
 
-unsigned hashPassword(string password)
-{
+int hashPassword(string password) {
 	hash<string> hasher;
-	string hashed_pass = password;
-	size_t hash = hasher(hashed_pass);
-	return hash;
+	return hasher(password);
 }
 
 void login(string username, string password) {
