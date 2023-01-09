@@ -5,11 +5,9 @@
 
 struct UserInfo {
 	string userName;
-	string	password;
+	int password;
 	double balance;
 };
-
-
 #endif // !ENCODINGPASSWORD_USERS_INFORMATION_H
 
 
