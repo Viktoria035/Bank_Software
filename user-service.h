@@ -180,15 +180,17 @@ UserInfo* getUser(string name) {
 }
 			
 
-void login(string username, string password) {
-	unsigned hashedPassword = hashPassword(password);
-	
-	for (UserInfo& user : users) {
-		if (user.username == username && user.password == intToString(hashedPassword)) {
-			isLogged = true;
-			loggedUser = user;
-		}
+bool login(string username, string password) {
+	UserInfo* user = getUser(username);
+	if(user != nullptr && user->password == hashPassword(password)) {
+		loggedUser = user;
+		return true;
 	}
+	return false;
+}
+
+void logout() {
+	loggedUser = nullptr;
 }
 
 string create(string username, string password)
@@ -213,11 +215,6 @@ string create(string username, string password)
 	loggedUser = user;
 	
 	return "You have just registered successfully!";
-}
-
-void logout() {
-	loggedUser = { "", "", 0 };
-	isLogged = false;
 }
 
 void cancelAccount() {
