@@ -153,14 +153,7 @@ bool validatePassword(string password)
 			return false;
 		}
 	}
-	if (smallLetter > 0 && bigLetter > 0 && symbol > 0)
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
+	return smallLetter > 0 && bigLetter > 0 && symbol > 0;
 }
 
 bool existsByUsername(string username) {
@@ -172,16 +165,20 @@ bool existsByUsername(string username) {
 	return false;
 }
 
-string intToString(int n)
-{
-	string str = to_string(n);
-	return str;
-}
-
 int hashPassword(string password) {
 	hash<string> hasher;
 	return hasher(password);
 }
+
+UserInfo* getUser(string name) {
+	for(int i =0; i<user.size();++i) {
+		if(users[i].username == username) {
+			return &users[i];
+		}
+	}
+	return nullptr;
+}
+			
 
 void login(string username, string password) {
 	unsigned hashedPassword = hashPassword(password);
