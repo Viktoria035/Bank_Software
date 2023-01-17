@@ -4,7 +4,7 @@
 #include <string>
 
 struct UserInfo {
-	string userName;
+	string username;
 	int password;
 	double balance;
 };
