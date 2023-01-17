@@ -208,88 +208,84 @@ string create(string username, string password)
 	unsigned hashedPassword = hashPassword(password);
 	string hash_pass = intToString(hashedPassword);
 
-	UserInfo user = { username, hash_pass, 0 };
+	UserInfo user = { username, hashPassword(password), 0 };
 	users.push_back(user);
 
 	isLogged = true;
-	loggedUser = user;
+	loggedUser = &users.back();
 	
 	return "You have just registered successfully!";
 }
 
-void cancelAccount() {
-	string password;
-	cin >> password;
-	if (isLogged && loggedUser.balance == 0)
-	{
-		vector<UserInfo>::iterator iter;
-		for (iter = users.begin(); iter != users.end(); iter++) {
-			if ((*iter).username == loggedUser.username) {
-				users.erase(iter);
-				break;
+bool checkPassword(string password) {
+	return hashPassword(password) == loggedUser->password;
+	//loggedUser->password == (*loggedUser).password
+}
+
+bool cancelAccount(string password) {
+	if(checkPassword(password) == loggedUser->balance == 0) {
+		for(int i = 0; i < users.size(); ++i) {
+			if(users[i].username == loggedUser->username) {
+				users.erase(users.begin() + i);
+				logout();
+				return true;
 			}
 		}
 	}
-	logout();
+	return false;
 }
 
-void deposit(double amount)
-{
-	if (amount < 0)
-	{
-		cout << "INVALID AMOUNT OF MONEY!" << endl;
-	}
-	else
-	{
-		int index = 0;
-		double newAmount = floor(amount * 100) / 100;// from 1.234 -- to --> 1.23
-		loggedUser.balance += newAmount;
-	}
+bool deposit(double amount) {
+	if (amount < 0 || amount > 10000) {
+		return false;
+	}	
+	loggedUser->balance += floor(amount * 100) / 100;// from 1.234 -- to --> 1.23
+	return true;
 }
 
-void withdraw(double amount)
+bool withdraw(double amount) {
+	if (amount < 0 || amount > 10000 || loggedUser->balance < amount) {
+		return false;
+	}
+	loggedUser->balance -= floor(amount * 100) / 100;
+	return true;
+}
+
+bool transfer(string username, double amount)
 {
-	if (amount < 0 || amount > 10000)
+	if (amount < 0 || amount > 10000 || loggedUser->balance < amount)
 	{
-		cout << "INVALID AMOUNT!" << endl;
+		return false;
 	}
 	double newAmount = floor(amount * 100) / 100;
-
-	if (amount > 0 && amount <= loggedUser.balance)
-	{
-		loggedUser.balance -= newAmount;
+	UserInfo* foundUser = getUser(username);
+	if(foundUser != nullptr) {
+		foundUser->balance += newAmount;
+		loggedUser->balance -= newAmount;
+		return true;
 	}
-}
-
-void transfer(string username, double amount)
-{
-	if (amount < 0 || amount > 10000 || (loggedUser.balance < amount))
-	{
-		cout << "INVALID AMOUNT" << endl;
-	}
-	int newAmount = floor(amount * 100 + 0.5) / 100;
-
+	return false;
 }
 
 bool saveState() {
-	ofstream deleteData("users.txt");
+	ofstream writeToFile("users.txt");
 
-	if (!deleteData.is_open()) {
-		cout << "File did not open!" << '\n';
+	if (!writeToFile.is_open()) {
+		cerr << "Error while opening the file." << endl;
 		return false;
 	}
 
-	deleteData << "";
-
-	deleteData.close();
-
-	ofstream writeToFile("users.txt", ios::app);
-
-	for (auto& x : users) {
-		writeToFile << x.username << ':' << x.password << ':' << x.balance << '\n';
+	for(int i = 0; i < users.size(); ++i;) {
+		writeToFile << users[i].username << ":" << users[i].password << ":" << users[i].balance << endl;
 	}
 
 	writeToFile.close();
 	return true;
+}
+
+void pause() {
+	cin.sync();
+	cout << "... press enter to continue ...";
+	cin.get();
 }
 #endif // ! ENCODINGPASSWORD_USER_SERVICE_H
