@@ -24,35 +24,6 @@ using namespace std;
 struct  UserInfo;
 vector<UserInfo> users;
 
-
-//double stringToDouble(string str) {
-//	double result = 0.0;
-//	int index = 0;
-//	for (int i = 0; i < str.size();i++) {
-//		if (str[i] == '.' || str[i] == ',') {
-//			index = i;
-//			break;
-//		}
-//		if (str[i] == '\0') {
-//			index = i;
-//			break;
-//		}
-//
-//		result *= 10;
-//		result += (double)(str[i] - '0');
-//	}
-//	int power = 1;
-//	for (int i = index + 1; i < str.size(); i++) {
-//
-//		if (str[i] == '\0') {
-//			break;
-//		}
-//		result += (double)((str[i] - '0') / pow(10, power));
-//		power++;
-//	}
-//	return result;
-//}
-
 int numbersAfterComa(string str) {
 	int i = 0;
 	if (str[0] == '-') {
