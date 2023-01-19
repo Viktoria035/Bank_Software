@@ -1,8 +1,8 @@
 # Bank_Software
 Project for introduction to progamming
 ## Description
-The project is simulation of some simple functuonalities of Bank Software, such as: deposit, withdraw, transfer some amount of money, cancel account, logout and of course, register, login and quit.
-## Some short description for thесе functionс:
+The project is simulation of some simple functuonalities of Bank Software, such as: deposit, withdraw, transfer (some amount of money), cancel account, logout and of course, register, login and quit.
+## Some short description for thеsе functionс:
 ### Deposit
 -Add money to your account(you can add 10 000 BGN at once).
 ### Withdraw 
