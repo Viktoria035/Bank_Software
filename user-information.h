@@ -1,13 +1,28 @@
-#ifndef ENCODINGPASSWORD_USERS_INFORMATION_H
-#define ENCODNGPASSWORD_USERS_INFORMATION_H
+/**
+*
+* Solution to course project # 9
+* Introduction to programming course
+* Faculty of Mathematics and Informatics of Sofia University
+* Winter semester 2022 / 2023
+*
+*@author Viktoria Koleva
+*@idnumber 5MI0600139 * @compiler VC
+*
+*<file with user-information struct>
+*
+*/
+#pragma once
 
 #include <string>
 
-struct UserInfo {
-	string username;
+struct UserInfo {//struct UserInfo --> type UserInfo
+	std::string username;
 	int password;
 	double balance;
-};
-#endif // !ENCODINGPASSWORD_USERS_INFORMATION_H
 
+	UserInfo(std::string, int, double);
+
+	UserInfo();
+
+};
 
