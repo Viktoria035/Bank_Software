@@ -15,7 +15,9 @@
 
 #include <string>
 
-struct UserInfo {//struct UserInfo --> type UserInfo
+//struct UserInfo --> type UserInfo
+struct UserInfo {
+	//properties
 	std::string username;
 	int password;
 	double balance;
@@ -25,4 +27,3 @@ struct UserInfo {//struct UserInfo --> type UserInfo
 	UserInfo();
 
 };
-
