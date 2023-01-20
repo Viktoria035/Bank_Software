@@ -83,9 +83,10 @@ bool checkAmount(string amount) {
 	return false;
 }
 
-bool CompareDoubles(double A, double B) {//compare strings to check if they are equal
-	double diff = A - B;
-	return (diff < EPSILON) && (diff > -EPSILON);
+bool compareDouble(double x, double y, double epsilon = 0.0000001) {
+	if (fabs(x - y) < epsilon)
+		return true; //they are same
+	return false; //they are not same
 }
 
 void loadUsers() {
@@ -156,22 +157,22 @@ bool validatePassword(string password) {
 	int symbol = 0;
 	int length = 0;
 	for (int i = 0; i < password.size(); i++) {
-		char temp = password[i];
-		if (password[i] >= 'a' && password[i] <= 'z') {
-			smallLetter++;
-		}
-		else if (password[i] >= 'A' && password[i] <= 'Z') {
-			bigLetter++;
-		}
-		else if ((password[i] >= '0' && password[i] <= '9')) {
-		}
-		else if (password[i] == '!' || password[i] == '@' || password[i] == '#' || password[i] == '$' ||
-			password[i] == '%' || password[i] == '^' || password[i] == '&' || password[i] == '*') {
-			symbol++;
-		}
-		else {
-			return false;
-		}
+char temp = password[i];
+if (password[i] >= 'a' && password[i] <= 'z') {
+	smallLetter++;
+}
+else if (password[i] >= 'A' && password[i] <= 'Z') {
+	bigLetter++;
+}
+else if ((password[i] >= '0' && password[i] <= '9')) {
+}
+else if (password[i] == '!' || password[i] == '@' || password[i] == '#' || password[i] == '$' ||
+	password[i] == '%' || password[i] == '^' || password[i] == '&' || password[i] == '*') {
+	symbol++;
+}
+else {
+	return false;
+}
 	}
 
 	return smallLetter > 0 && bigLetter > 0 && symbol > 0;
@@ -200,21 +201,21 @@ UserInfo* getUser(string username) {
 	return nullptr;
 }
 
-bool login(string username, string password,UserInfo* &user) {//pointer to sth and reference that change the value of the pointer
+bool login(string username, string password, UserInfo*& user) {//pointer to sth and reference that change the value of the pointer
 	user = getUser(username);
 	if (user != nullptr && user->password == hashPassword(password)) {
-	
+
 		return true;
 	}
 	return false;
 }
 
-void logout(UserInfo* &loggedUser) {
+void logout(UserInfo*& loggedUser) {
 	loggedUser = nullptr;
 }
 
 //Always called when loggedUser is nullptr
-string create(string username, string password, UserInfo* &loggedUser) {
+string create(string username, string password, UserInfo*& loggedUser) {
 	if (!validateUsername(username)) {
 		return INVALID_USERNAME;
 	}
@@ -233,13 +234,13 @@ string create(string username, string password, UserInfo* &loggedUser) {
 	return REGISTERED_SUCCESSFULLY_MESSAGE;
 }
 
-bool checkPassword(string password, UserInfo* &loggedUser) { 
+bool checkPassword(string password, UserInfo*& loggedUser) {
 	return hashPassword(password) == loggedUser->password;//-> structure pointer; accessing structure members by structure pointer
 	//loggedUser->password  <=>   (*loggedUser).password
 }
 
-bool cancelAccount(string password, UserInfo* &loggedUser) {
-	if (checkPassword(password,loggedUser) && loggedUser->balance == 0) {
+bool cancelAccount(string password, UserInfo*& loggedUser) {
+	if (checkPassword(password, loggedUser) && loggedUser->balance == 0) {
 		for (int i = 0; i < users.size(); ++i) {
 			if (users[i].username == loggedUser->username) {
 				users.erase(users.begin() + i);
@@ -251,24 +252,27 @@ bool cancelAccount(string password, UserInfo* &loggedUser) {
 	return false;
 }
 
-bool deposit(double amount, UserInfo* &loggedUser) {
-
-	if (amount < 0 || amount > 10000) {
+bool deposit(double amount, UserInfo*& loggedUser) {
+	double newAmount = floor(amount * 100.0) / 100.0;
+	if (newAmount < 0 || newAmount > 10000) {
 		return false;
 	}
-	
-	loggedUser->balance += floor(amount * 100) / 100;// from 1.234 - to-> 1.23
+	if (compareDouble(abs(loggedUser->balance), newAmount)){
+		loggedUser->balance = 0.00;
+		return true;
+	}
+	loggedUser->balance += amount;// from 1.234 - to-> 1.23
 	return true;
 }
 
 bool withdraw(double amount, UserInfo* &loggedUser) {
-	double newAmount = floor(amount * 100) / 100;
+	double newAmount = floor(amount * 100.0) / 100.0;
 	if (newAmount < 0 || newAmount > 10000 || loggedUser->balance-newAmount < MIN) {
 		return false;
 	}
 	
-	if (CompareDoubles(loggedUser->balance, newAmount)) {
-		loggedUser->balance = 0.0;
+	if (compareDouble(loggedUser->balance, newAmount)) {
+		loggedUser->balance = 0.00;
 		return true;
 	}
 	loggedUser->balance -= newAmount;
@@ -284,8 +288,8 @@ bool transfer(string username, double amount,UserInfo* &loggedUser) {
 	UserInfo* foundUser = getUser(username);
 	if (foundUser != nullptr) {
 		foundUser->balance += newAmount;
-		if (CompareDoubles(loggedUser->balance, newAmount)) {
-			loggedUser->balance = 0.0;
+		if (compareDouble(loggedUser->balance, newAmount)) {
+			loggedUser->balance = 0.00;
 			return true;
 		}
 		loggedUser->balance -= newAmount;
