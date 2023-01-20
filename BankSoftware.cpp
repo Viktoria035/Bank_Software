@@ -48,25 +48,26 @@ int main() {
     while (true) {
         
         if (loggedUser != nullptr) {
+            cout << LOGGED_MENU_OPENNING << endl;
             cout << "You have " << loggedUser->balance << " BGN. " << "Choose one of the following options : " << endl;
-            cout << "====================================================" << endl;
+            cout << EQUAL_SYMBOL << endl;
             LoggedMenu();
-            cout << "====================================================" << endl;
+            cout << EQUAL_SYMBOL << endl;
             getline(cin, command);
 
             if (command == CANCEL_COMMAND) {
                 string password;
-                cout << "Please enter your password to cancel your account: ";
+                cout << USERNAME_TO_CANCEL;
                 cin >> password;
-                cout << "====================================================" << endl;
+                cout << EQUAL_SYMBOL << endl;
                 cin.ignore();
                 if (!cancelAccount(password,loggedUser)) {
-                    cout << "Please check if your account is with balance 0, else please check your password." << endl;
+                    cout << ERROR_TO_CANCEL << endl;
                     
                 }
                 else {
                     loggedUser = nullptr;
-                    cout << "Your account is successfully canceled, have a nice day!" << endl;
+                    cout << SUCCESS_MESSAGE_CANCEL << endl;
                 }
                 pause();
                 system("cls");
@@ -75,60 +76,80 @@ int main() {
 
             else if (command == DEPOSIT_COMMAND) {
                 string amount;
-                cout << "Please enter how much money you want to deposit: ";
+                cout << DEPOSIT_AMOUNT;
                 cin >> amount;
-                cout << "====================================================" << endl;
+                cout << EQUAL_SYMBOL << endl;
                 cin.ignore();
-                double amountInDouble = stringToDouble(amount);
-                if (!deposit(amountInDouble,loggedUser)) {
-                        cout << "Invalid amount of money, it must be between 0-10000 BGN." << endl;
+                if (!(checkAmount(amount))) {
+                    cout << INVALID_VALUE << endl;
+                    pause();
+                }
+                else {
+                    double amountInDouble = stringToDouble(amount);
+                    if (!deposit(amountInDouble, loggedUser)) {
+                        cout << TOO_MUCH_AMOUNT_OF_MONEY << endl;
                         pause();
+                    }
                 }
                 system("cls");
                 saveState();
             }
             
-            else if (command == WITHDRAW_COMMAND)
-            {
+            else if (command == WITHDRAW_COMMAND) {
                 
                 string amount;
-                cout << "Please enter how much money you want to withdraw: ";
+                cout << WITHDRAW_AMOUNT;
                 cin >> amount;
-                cout << "====================================================" << endl;
-                double amountInDouble = stringToDouble(amount);
+                cout << EQUAL_SYMBOL << endl;
                 cin.ignore();
-                if (!withdraw(amountInDouble,loggedUser)) {
-                    cout << "Invalid amount of money, it must be between 0-10000 BGN and not bigger than your account balance." << endl;
+                if (!(checkAmount(amount))) {
+                    cout << INVALID_VALUE << endl;
                     pause();
-                }   
+                }
+                else {
+                    double amountInDouble = stringToDouble(amount);
+                    if (!withdraw(amountInDouble, loggedUser)) {
+                        cout << TOO_MUCH_AMOUNT_OF_MONEY << endl;
+                        pause();
+                    }
+                }
                 system("cls");
                 saveState();
             }
 
-            else if (command == TRANSFER_COMMAND)
-            {
+            else if (command == TRANSFER_COMMAND) {
                 string amount;
                 string destName = "";
-                cout << "Please enter how much money you want to transfer: ";
+                cout << TRANSFER_AMOUNT;
                 cin >> amount;
-                cout << "====================================================" << endl;
-                double amountInDouble = stringToDouble(amount);
+                cout << EQUAL_SYMBOL << endl;
                 cin.ignore();
-                cout << "Please enter the username to which you want to transfer the money: ";
-                getline(cin, destName);
-                cout << "====================================================" << endl;
-                if (!transfer(destName, amountInDouble,loggedUser)) {
-                    cout << "Unfortunately, there is a problem: the amount of money you want to transfer is not between 0-10000 BGN," <<
-                        "or an account with this username not exists." << endl;
+                if (!(checkAmount(amount))) {
+                    cout << INVALID_VALUE << endl;
+                    pause();
                 }
-                pause();
+                else {
+                    double amountInDouble = stringToDouble(amount);
+                    cout << SEARCHING_USERNAME;
+                    getline(cin, destName);
+                    cout << EQUAL_SYMBOL << endl;
+                    if (!transfer(destName, amountInDouble, loggedUser)) {
+                        cout << ERROR_BEGINNING << endl;
+                        cout << POSSIBLE_ERROR_ONE << endl;
+                        cout<< POSSIBLE_ERROR_TWO << endl;
+                    }
+                    else {
+                        cout << SUCCESS_TRANSFER << endl;
+                    }
+                    pause();
+                }
                 system("cls");
                 saveState();
             }
 
             else if (command == LOGOUT_COMMAND) {
                 logout(loggedUser);
-                cout << "You have just logout successfully, have a nice day!" << endl;
+                cout << SUCCES_LOGOUT_MESSAGE << endl;
                 pause();
                 system("cls");
                 saveState();
@@ -139,31 +160,31 @@ int main() {
             }
 
             else {
-                cout << "Not existing command!" << endl;
+                cout << NOT_EXISTING_COMMAND << endl;
                 pause();
                 system("cls");
             }
         }
         
         else {
-            cout << "====================GUEST MENU====================" << endl;
-            cout << "Enter one of the following options in the menu: " << endl;
+            cout << GUEST_MENU_OPENNING << endl;
+            cout << GUEST_MENU_COMMANDS << endl;
             GuestMenu();
-            cout << "====================================================" << endl;
+            cout << EQUAL_SYMBOL << endl;
             getline(cin, command);
 
             if (command == LOGIN_COMMAND) {
                 string username;
-                cout << "Please enter your username: ";
+                cout << ADD_USERNAME_TO_LOGIN;
                 getline(cin, username);
-                cout << "====================================================" << endl;
+                cout << EQUAL_SYMBOL << endl;
                 string password;
-                cout << "Please enter your password: ";
+                cout << ADD_PASSWORD_TO_LOGIN;
                 cin >> password;
-                cout << "====================================================" << endl;
+                cout << EQUAL_SYMBOL << endl;
                 cin.ignore();
                 if (!login(username, password,loggedUser)) {
-                    cout << "Invalid username or password." << endl;
+                    cout << ERROR_TO_LOGIN << endl;
                     loggedUser = nullptr;
                     pause();
                 }
@@ -173,12 +194,22 @@ int main() {
 
             else if (command == REGISTER_COMMAND) {
                 string username, password;
-                cout << "Please enter your username(only using latin letters and symbols): ";
+                cout << CREATE_USERNAME;
                 getline(cin, username);
-                cout << "====================================================" << endl;
-                cout << "Enter yout password(only latin letters, symbols-!@#$%^&* and numbers, it must be at least 5 symbols): ";
+                cout << EQUAL_SYMBOL << endl;
+                cout << CREATE_PASSWORD << endl;
+                cout << STAR_SYMBOLS << endl;
+                cout << RULE_ONE << endl;
+                cout << STAR_SYMBOLS << endl;
+                cout << RULE_TWO << endl;
+                cout << STAR_SYMBOLS << endl;
+                cout << RULE_THREE << endl;
+                cout << STAR_SYMBOLS << endl;
+                cout << RULE_FOUR << endl;
+                cout << STAR_SYMBOLS << endl;
+                cout << ENTER_PASS;
                 cin >> password;
-                cout << "====================================================" << endl;
+                cout << STAR_SYMBOLS << endl;
                 cin.ignore();
                 cout << create(username, password, loggedUser) << endl;
                 pause();
@@ -191,7 +222,7 @@ int main() {
             }
 
             else {
-                cout << "Not existing command!" << endl;
+                cout << NOT_EXISTING_COMMAND << endl;
                 pause();
                 system("cls");
             }
