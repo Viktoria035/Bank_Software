@@ -20,8 +20,11 @@ UserInfo::UserInfo() {
 	this->username = "\0";
 }
 
-UserInfo::UserInfo(std::string username, int password, double balance) { // initialinzing User Information
+UserInfo::UserInfo(std::string username, int password, double balance) {
+	// initializing UserInfo properties/members
 	this->balance = balance;
 	this->password = password;
 	this->username = username;
+	//'this' pointer is passed as a hidden argument to all nonstatic member function calls 
+	//and is available as a local variable within the body of all nonstatic functions
 }
