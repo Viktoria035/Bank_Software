@@ -19,7 +19,6 @@ struct UserInfo;
 int numbersAfterComa(string str);
 double stringToDouble(string str);
 bool checkAmount(string amount);
-bool CompareDoubles(double A, double B);
 void loadUsers();
 bool validateUsername(string name);
 bool validatePassword(string password);
