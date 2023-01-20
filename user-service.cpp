@@ -8,17 +8,19 @@
 *@author Viktoria Koleva
 *@idnumber 5MI0600139 * @compiler VC
 *
-*<file with user-service function>
+*<file with user-service functions>
 *
 */
 #include <iostream>
 #include <string>
 #include <vector>
 #include <fstream>
+#include <cmath>
+#include <iomanip>
 #include "user-information.h"
 #include "Constant-comands.h"
 #include "user-service.h"
-#include <iomanip>
+
 using namespace std;
 
 struct  UserInfo;
@@ -42,6 +44,7 @@ int numbersAfterComa(string str) {
 
 	return  counter;
 }
+
 double stringToDouble(string str)
 {
 	double number = 0.0;
@@ -68,8 +71,24 @@ double stringToDouble(string str)
 	return number;
 }
 
-void loadUsers()
-{
+bool checkAmount(string amount) {
+	for (int i = 0; i < amount.size(); i++) {
+		if (amount[i] == '-' ||
+			amount[i] == ',' || 
+			amount[i] == '.' ||
+			(amount[i] >= '0' && amount[i] <= '9')) {
+			return true;
+		}
+	}
+	return false;
+}
+
+bool CompareDoubles(double A, double B) {//compare strings to check if they are equal
+	double diff = A - B;
+	return (diff < EPSILON) && (diff > -EPSILON);
+}
+
+void loadUsers() {
 	std::ifstream file("users.txt");
 
 	if (!file.is_open()) {
@@ -78,23 +97,20 @@ void loadUsers()
 	}
 
 	string current;
-	while (!file.eof())
-	{
+	while (!file.eof()) {
 		getline(file, current);
 		if (current.size() == 0) {
 			break;
 		}
 		UserInfo user;
 		int i = 0;
-		while (current[i] != ':')
-		{
+		while (current[i] != ':') {
 			user.username.push_back(current[i]);
 			++i;
 		}
 		++i; //going after first :
 		string curPass;
-		while (current[i] != ':')
-		{
+		while (current[i] != ':') {
 			curPass.push_back(current[i]);
 			++i;
 		}
@@ -103,7 +119,7 @@ void loadUsers()
 		++i; //going after second :
 
 		string curBalance;
-		while (i < current.size()) {//check if '\0' is better
+		while (i < current.size()) { //check if '\0' is better
 			curBalance.push_back(current[i]);
 			++i;
 		}
@@ -127,8 +143,7 @@ bool validateUsername(string name)
 	return true;
 }
 
-bool validatePassword(string password)
-{
+bool validatePassword(string password) {
 	int j = 0;
 	while (password[j] != '\0') {
 		j++;
@@ -185,8 +200,7 @@ UserInfo* getUser(string username) {
 	return nullptr;
 }
 
-bool login(string username, string password,UserInfo* &user) {
-
+bool login(string username, string password,UserInfo* &user) {//pointer to sth and reference that change the value of the pointer
 	user = getUser(username);
 	if (user != nullptr && user->password == hashPassword(password)) {
 	
@@ -219,8 +233,8 @@ string create(string username, string password, UserInfo* &loggedUser) {
 	return REGISTERED_SUCCESSFULLY_MESSAGE;
 }
 
-bool checkPassword(string password, UserInfo* &loggedUser) {//pointer to something and reference that change the value of the pointer 
-	return hashPassword(password) == loggedUser->password;
+bool checkPassword(string password, UserInfo* &loggedUser) { 
+	return hashPassword(password) == loggedUser->password;//-> structure pointer; accessing structure members by structure pointer
 	//loggedUser->password  <=>   (*loggedUser).password
 }
 
@@ -242,8 +256,8 @@ bool deposit(double amount, UserInfo* &loggedUser) {
 	if (amount < 0 || amount > 10000) {
 		return false;
 	}
-	//double newAmount = floor(amount * 100) / 100;// from 1.234 - to-> 1.23
-	loggedUser->balance += floor(amount * 100) / 100;
+	
+	loggedUser->balance += floor(amount * 100) / 100;// from 1.234 - to-> 1.23
 	return true;
 }
 
@@ -252,7 +266,11 @@ bool withdraw(double amount, UserInfo* &loggedUser) {
 	if (newAmount < 0 || newAmount > 10000 || loggedUser->balance-newAmount < MIN) {
 		return false;
 	}
-	/*double newAmount = floor(amount * 100) / 100;*/
+	
+	if (CompareDoubles(loggedUser->balance, newAmount)) {
+		loggedUser->balance = 0.0;
+		return true;
+	}
 	loggedUser->balance -= newAmount;
 	return true;
 }
@@ -266,6 +284,10 @@ bool transfer(string username, double amount,UserInfo* &loggedUser) {
 	UserInfo* foundUser = getUser(username);
 	if (foundUser != nullptr) {
 		foundUser->balance += newAmount;
+		if (CompareDoubles(loggedUser->balance, newAmount)) {
+			loggedUser->balance = 0.0;
+			return true;
+		}
 		loggedUser->balance -= newAmount;
 		return true;
 	}
@@ -289,9 +311,8 @@ bool saveState() {
 	return true;
 }
 
-void pause()
-{
-	cin.sync();
+void pause() {
+	cin.sync();//discards all that is left in the buffer
 	cout << "... press enter to continue ...";
-	cin.get();
+	cin.get();//is used for accessing character array, cin.get() reads a string with the whitespace
 }
